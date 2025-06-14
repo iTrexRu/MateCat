@@ -58,8 +58,8 @@ RUN chown -R www-data:www-data /var/www/html \
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Configure Apache to use public/ directory and enable rewrite rules
-RUN echo "<Directory /var/www/html/public>\n\
+# Configure Apache to use root directory and enable rewrite rules
+RUN echo "<Directory /var/www/html>\n\
     Options FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
@@ -69,7 +69,7 @@ RUN echo "<Directory /var/www/html/public>\n\
     RewriteRule ^ index.php [L]\n\
 </Directory>" > /etc/apache2/conf-available/matecat.conf \
 && a2enconf matecat \
-&& sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+&& sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|' /etc/apache2/sites-available/000-default.conf
 
 # Expose port (Railway assigns a dynamic port)
 EXPOSE $PORT
