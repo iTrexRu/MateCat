@@ -51,9 +51,10 @@ WORKDIR /var/www/html
 # Copy application code
 COPY . /var/www/html
 
-# Set file permissions for Apache
+# Set file permissions for Apache and storage directory
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
