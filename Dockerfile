@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-enable \
     curl \
     dom \
-    pdo \
     pdo_mysql \
     zip \
     gd \
@@ -50,6 +49,9 @@ WORKDIR /var/www/html
 
 # Copy application code
 COPY . /var/www/html
+
+# Create storage directory if it doesn't exist
+RUN mkdir -p /var/www/html/storage
 
 # Set file permissions for Apache and storage directory
 RUN chown -R www-data:www-data /var/www/html \
