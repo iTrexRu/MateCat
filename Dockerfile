@@ -42,20 +42,31 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Set ServerName to suppress Apache FQDN warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
 # Copy application code
 COPY . /var/www/html
 
+# Set file permissions for Apache
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Configure Apache to use public/ directory
+# Configure Apache to use public/ directory and enable rewrite rules
 RUN echo "<Directory /var/www/html/public>\n\
-    Options Indexes FollowSymLinks\n\
+    Options FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
+    RewriteEngine On\n\
+    RewriteCond %{REQUEST_FILENAME} !-f\n\
+    RewriteCond %{REQUEST_FILENAME} !-d\n\
+    RewriteRule ^ index.php [L]\n\
 </Directory>" > /etc/apache2/conf-available/matecat.conf \
 && a2enconf matecat \
 && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
