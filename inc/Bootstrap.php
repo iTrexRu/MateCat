@@ -27,7 +27,8 @@ class Bootstrap {
 
     private function __construct( SplFileInfo $config_file = null, SplFileInfo $task_runner_config_file = null ) {
     ini_set('display_errors', true);
-    ini_set('error_log', self::$_ROOT . '/local_storage/log_archive/php_errors.txt');
+    ini_set('display_startup_errors', true);
+    ini_set('error_log', 'php://stderr'); // Записывать ошибки в stderr для Railway логов
     error_reporting(E_ALL);
         
         self::$_ROOT = realpath( dirname( __FILE__ ) . '/../' );
