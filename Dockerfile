@@ -4,12 +4,18 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# Добавляем репозиторий для PHP 8.1
-RUN apt-get update && apt-get install -y software-properties-common \
+# Устанавливаем базовые пакеты и добавляем репозиторий PHP
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    curl \
+    wget \
+    git \
+    unzip \
+    supervisor \
     && add-apt-repository ppa:ondrej/php \
     && apt-get update
 
-# Устанавливаем системные зависимости с PHP 8.1
+# Устанавливаем Apache и PHP 8.1 с модулями
 RUN apt-get install -y \
     apache2 \
     php8.1 \
@@ -27,15 +33,10 @@ RUN apt-get install -y \
     php8.1-bcmath \
     mysql-client \
     redis-tools \
-    curl \
-    git \
-    wget \
-    unzip \
-    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Включаем Apache модули
-RUN a2enmod rewrite ssl headers expires deflate filter php8.1
+RUN a2enmod rewrite ssl headers expires deflate filter
 
 # Устанавливаем Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
@@ -50,18 +51,18 @@ WORKDIR /var/www/html
 # Копируем код проекта
 COPY . .
 
-# Устанавливаем PHP зависимости
-RUN composer install --no-dev --optimize-autoloader
+# Копируем конфигурацию Apache
+COPY config/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 
-# Устанавливаем Node.js зависимости (если есть package.json)
+# Устанавливаем PHP зависимости (если composer.json существует)
+RUN if [ -f composer.json ]; then composer install --no-dev --optimize-autoloader --ignore-platform-reqs; fi
+
+# Устанавливаем Node.js зависимости (если package.json существует)
 RUN if [ -f package.json ]; then npm install --production; fi
 
 # Настраиваем права доступа
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
-
-# Копируем конфигурацию Apache
-COPY config/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Создаем конфигурацию supervisor
 RUN echo '[supervisord]\n\
