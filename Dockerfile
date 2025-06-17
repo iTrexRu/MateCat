@@ -61,7 +61,7 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
 # Копируем конфигурацию Apache
-COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
+COPY config/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Создаем конфигурацию supervisor
 RUN echo '[supervisord]\n\
