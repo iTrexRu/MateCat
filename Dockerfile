@@ -55,7 +55,7 @@ COPY config/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 RUN if [ -f composer.json ]; then composer install --no-dev --optimize-autoloader --ignore-platform-reqs; fi
 
 # Устанавливаем Node.js зависимости (если package.json существует)  
-RUN if [ -f package.json ]; then npm install --production; fi
+RUN if [ -f package.json ]; then npm install --production --legacy-peer-deps; fi
 
 # Настраиваем права доступа
 RUN chown -R www-data:www-data /var/www/html \
