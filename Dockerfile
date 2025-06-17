@@ -4,35 +4,31 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# Устанавливаем базовые пакеты и добавляем репозиторий PHP
+# Обновляем пакеты и устанавливаем все зависимости
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
+    apache2 \
+    php8.0 \
+    php8.0-fpm \
+    libapache2-mod-php8.0 \
+    php8.0-mysql \
+    php8.0-curl \
+    php8.0-xml \
+    php8.0-mbstring \
+    php8.0-redis \
+    php8.0-zip \
+    php8.0-gd \
+    php8.0-dev \
+    php8.0-intl \
+    php8.0-bcmath \
+    php8.0-json \
+    mysql-client \
+    redis-tools \
     curl \
     wget \
     git \
     unzip \
     supervisor \
-    && add-apt-repository ppa:ondrej/php \
-    && apt-get update
-
-# Устанавливаем Apache и PHP 8.1 с модулями
-RUN apt-get install -y \
-    apache2 \
-    php8.1 \
-    php8.1-fpm \
-    libapache2-mod-php8.1 \
-    php8.1-mysql \
-    php8.1-curl \
-    php8.1-xml \
-    php8.1-mbstring \
-    php8.1-redis \
-    php8.1-zip \
-    php8.1-gd \
-    php8.1-dev \
-    php8.1-intl \
-    php8.1-bcmath \
-    mysql-client \
-    redis-tools \
+    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
 # Включаем Apache модули
@@ -40,7 +36,9 @@ RUN a2enmod rewrite ssl headers expires deflate filter
 
 # Устанавливаем Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -57,7 +55,7 @@ COPY config/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 # Устанавливаем PHP зависимости (если composer.json существует)
 RUN if [ -f composer.json ]; then composer install --no-dev --optimize-autoloader --ignore-platform-reqs; fi
 
-# Устанавливаем Node.js зависимости (если package.json существует)
+# Устанавливаем Node.js зависимости (если package.json существует)  
 RUN if [ -f package.json ]; then npm install --production; fi
 
 # Настраиваем права доступа
