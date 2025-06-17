@@ -7,20 +7,20 @@ ENV TZ=UTC
 # Обновляем пакеты и устанавливаем все зависимости
 RUN apt-get update && apt-get install -y \
     apache2 \
-    php8.0 \
-    php8.0-fpm \
-    libapache2-mod-php8.0 \
-    php8.0-mysql \
-    php8.0-curl \
-    php8.0-xml \
-    php8.0-mbstring \
-    php8.0-redis \
-    php8.0-zip \
-    php8.0-gd \
-    php8.0-dev \
-    php8.0-intl \
-    php8.0-bcmath \
-    php8.0-json \
+    php7.4 \
+    php7.4-fpm \
+    libapache2-mod-php7.4 \
+    php7.4-mysql \
+    php7.4-curl \
+    php7.4-xml \
+    php7.4-mbstring \
+    php7.4-redis \
+    php7.4-zip \
+    php7.4-gd \
+    php7.4-dev \
+    php7.4-intl \
+    php7.4-bcmath \
+    php7.4-json \
     mysql-client \
     redis-tools \
     curl \
@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     supervisor \
-    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
 # Включаем Apache модули
